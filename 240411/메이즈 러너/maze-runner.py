@@ -83,6 +83,7 @@ def print_status():
     print()
 
 def play():
+    global mapp
     move_count = 0
     
     for T in range(K):
@@ -98,6 +99,7 @@ def play():
         
         # move
         to_remove = []
+        next_map = copy.deepcopy(mapp)
         for p in range(len(player_positions)):
             px, py = player_positions[p]
             nx, ny = get_next_position(px, py, ex, ey)
@@ -106,11 +108,10 @@ def play():
                 move_count += abs(mapp[px][py])
                 if mapp[nx][ny] == E:
                     to_remove.append(p)
-                elif mapp[nx][ny] < 0:
-                    mapp[nx][ny] += mapp[px][py]
                 else:
-                    mapp[nx][ny] = mapp[px][py]
-                mapp[px][py] = 0
+                    next_map[nx][ny] += mapp[px][py]
+                next_map[px][py] -= mapp[px][py]
+        mapp = next_map
         
         for i in range(len(to_remove) - 1, -1, -1):
             player_positions.pop(to_remove[i])
