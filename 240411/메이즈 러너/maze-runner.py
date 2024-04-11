@@ -1,14 +1,14 @@
 import sys, copy, math
 input = sys.stdin.readline
 
-P, E = -1, -2
+P, E = -1, float('inf')
 
 def get_next_position(px, py, ex, ey):
     dx, dy = int((ex - px) / abs(ex - px)) if ex - px != 0 else 0, int((ey - py) / abs(ey - py)) if ey - py != 0 else 0 
 
-    if dx != 0 and mapp[px + dx][py] > 0:
+    if dx != 0 and 1 <= mapp[px + dx][py] <= 9:
         dx = 0
-    if dy != 0 and mapp[px][py + dy] > 0:
+    if dy != 0 and 1 <= mapp[px][py + dy] <= 9:
         dy = 0
     
     if dx != 0 and dy != 0:
@@ -23,7 +23,7 @@ def get_next_position(px, py, ex, ey):
 def find_square_positions(player_positions, ex, ey):
     min_square_length = float('inf')
 
-    for p in range(M):
+    for p in range(len(player_positions)):
         px, py = player_positions[p]
         square_length = max(abs(ex - px) + 1, abs(ey - py) + 1)
         
@@ -35,10 +35,10 @@ def find_square_positions(player_positions, ex, ey):
         for j in range(min_square_length):
             sy = max(0, ey - (min_square_length - 1)) + j
             for i2 in range(min_square_length):
-                x = sx + i2
+                x = min(sx + i2, N - 1)
                 for j2 in range(min_square_length):
-                    y = sy + j2
-                    if mapp[x][y] == P:
+                    y = min(sy + j2, N - 1)
+                    if mapp[x][y] < 0:
                         return sx, sy, sx + min_square_length - 1, sy + min_square_length - 1
 
 def rotate_map(start_x, start_y, end_x, end_y):
@@ -72,14 +72,14 @@ def rotate_map(start_x, start_y, end_x, end_y):
 def print_status():
     for i in range(N):
         for j in range(N):
-            if (mapp[i][j] == P): print("P", end = " ")
+            if (mapp[i][j] < 0): print("P", end = " ")
             elif (mapp[i][j] == E): print("E", end = " ")
             else: print(mapp[i][j], end = " ")
         print()
     print()
 
 def play():
-    global player_positions, M
+    global player_positions
 
     move_count = 0
     
@@ -89,29 +89,30 @@ def play():
 
         for i in range(N):
             for j in range(N):
-                if mapp[i][j] == P:
+                if mapp[i][j] < 0:
                     player_positions.append([i, j])
                 elif mapp[i][j] == E:
                     ex, ey = i, j
         
         # move
         to_remove = []
-        for p in range(M):
+        for p in range(len(player_positions)):
             px, py = player_positions[p]
             nx, ny = get_next_position(px, py, ex, ey)
             player_positions[p] = [nx, ny]
             if px != nx or py != ny:
-                mapp[px][py] = 0
-                move_count += 1
+                move_count += abs(mapp[px][py])
                 if mapp[nx][ny] == E:
                     to_remove.append(p)
+                elif mapp[nx][ny] == P:
+                    mapp[nx][ny] = mapp[px][py] - 1
                 else:
-                    mapp[nx][ny] = P
+                    mapp[nx][ny] = mapp[px][py]
+                mapp[px][py] = 0
         
         for i in range(len(to_remove) - 1, -1, -1):
             player_positions.pop(to_remove[i])
-            M -= 1
-        if M == 0:
+        if len(player_positions) == 0:
             break
         
         # rotate
