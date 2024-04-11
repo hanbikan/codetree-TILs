@@ -1,7 +1,7 @@
 import sys, copy, math
 input = sys.stdin.readline
 
-P, E = -1, float('inf')
+E = float('inf')
 
 def get_next_position(px, py, ex, ey):
     dx, dy = int((ex - px) / abs(ex - px)) if ex - px != 0 else 0, int((ey - py) / abs(ey - py)) if ey - py != 0 else 0 
@@ -31,13 +31,17 @@ def find_square_positions(player_positions, ex, ey):
             min_square_length = square_length
     
     for i in range(min_square_length):
-        sx = max(0, ex - (min_square_length - 1)) + i
+        sx = ex - (min_square_length - 1) + i
+        if sx < 0: continue
         for j in range(min_square_length):
-            sy = max(0, ey - (min_square_length - 1)) + j
+            sy = ey - (min_square_length - 1) + j
+            if sy < 0: continue
             for i2 in range(min_square_length):
-                x = min(sx + i2, N - 1)
+                x = sx + i2
+                if x > N - 1: continue
                 for j2 in range(min_square_length):
-                    y = min(sy + j2, N - 1)
+                    y = sy + j2
+                    if y > N - 1: continue
                     if mapp[x][y] < 0:
                         return sx, sy, sx + min_square_length - 1, sy + min_square_length - 1
 
@@ -79,8 +83,6 @@ def print_status():
     print()
 
 def play():
-    global player_positions
-
     move_count = 0
     
     for T in range(K):
@@ -99,13 +101,13 @@ def play():
         for p in range(len(player_positions)):
             px, py = player_positions[p]
             nx, ny = get_next_position(px, py, ex, ey)
-            player_positions[p] = [nx, ny]
             if px != nx or py != ny:
+                player_positions[p] = [nx, ny]
                 move_count += abs(mapp[px][py])
                 if mapp[nx][ny] == E:
                     to_remove.append(p)
-                elif mapp[nx][ny] == P:
-                    mapp[nx][ny] = mapp[px][py] - 1
+                elif mapp[nx][ny] < 0:
+                    mapp[nx][ny] += mapp[px][py]
                 else:
                     mapp[nx][ny] = mapp[px][py]
                 mapp[px][py] = 0
@@ -141,7 +143,7 @@ for i in range(M):
     player_positions[i][1] -= 1
 
 for px, py in player_positions:
-    mapp[px][py] = P
+    mapp[px][py] -= 1
 
 ex, ey = map(int,input().split())
 ex -= 1
