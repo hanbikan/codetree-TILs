@@ -190,12 +190,19 @@ def play():
         # 루돌프 이동
         target_p = get_nearest_santa()
         move_rudolf(target_p)
+
         # 산타 이동
         move_santas()
 
-        if len(s_pos) == 0:
+        # 산타 전부 탈락했는지 체크
+        retired = 0
+        for sx, sy in s_pos.values():
+            if sx == -1:
+                retired += 1
+        if retired == P:
             break
 
+        # 점수, 상태 변경
         for p in s_pos.keys():
             if s_pos[p][0] == -1: continue
             scores[p] += 1 # 살아있는 산타 점수 추가
