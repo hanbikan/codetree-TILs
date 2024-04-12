@@ -45,6 +45,8 @@ def handle_collision(x, y, nx, ny):
         if in_range(ncx, ncy):
             s_pos[cp] = [ncx, ncy]
             mapp[ncx][ncy] = mapp[cx][cy]
+        else:
+            s_pos[cp] = [-1, -1]
 
     p = mapp[x][y]
     if in_range(nx, ny):
@@ -70,10 +72,10 @@ def move_rudolf(target_p):
             min_distance = distance
             min_dx, min_dy = dx, dy
 
-    # 산타 이동 + 상호작용
-    nsx, nsy = tx + min_dx * C, ty + min_dy * C # 산타가 튕겨나간 위치
+    # 충돌
     if mapp[rx + min_dx][ry + min_dy] >= 1:
-        handle_collision(rx + min_dx, ry + min_dy, nsx, nsy)
+        ntx, nty = tx + min_dx * C, ty + min_dy * C  # 산타가 튕겨나갈 위치
+        handle_collision(tx, ty, ntx, nty)
 
         status[target_p] = 2  # 기절
         scores[target_p] += C # 점수
@@ -101,7 +103,6 @@ def get_next_santa_pos(sx, sy):
     return [min_x, min_y]
 
 def move_santas():
-    p_to_remove = []
     for p in range(1, P + 1):
         sx, sy = s_pos[p]
         if sx == -1:
@@ -115,12 +116,12 @@ def move_santas():
         rdx, rdy = -dx, -dy
 
         if mapp[nsx][nsy] == RUDOLF:
-            csx, csy = sx + rdx * (D - 1), sy + rdy * (D - 1)
-            handle_collision(sx, sy, csx, csy)
+            nsx, nsy = sx + rdx * (D - 1), sy + rdy * (D - 1)
+            handle_collision(sx, sy, nsx, nsy)
 
             status[p] = 2 # 기절
             scores[p] += D # 점수
-        else:
+        else: # 빈 공간
             mapp[sx][sy] = EMPTY
             mapp[nsx][nsy] = p
             s_pos[p] = [nsx, nsy]
