@@ -59,7 +59,6 @@ def move_rudolf(target_p):
                 offset += 1
             else:
                 break
-
         # 뒤에 있는 산타부터 이동
         for i in range(len(to_move) - 1, -1, -1):
             p_to_move = to_move[i]
@@ -99,7 +98,10 @@ def get_next_santa_pos(sx, sy):
 
 def move_santas():
     p_to_remove = []
-    for p, (sx, sy) in s_pos.items():
+    for p in range(1, P + 1):
+        if not s_pos.get(p):
+            continue
+        sx, sy = s_pos[p]
         if status[p] != 0:
             continue
         nsx, nsy = get_next_santa_pos(sx, sy)
@@ -167,6 +169,16 @@ def move_santas():
 1 3 3
 2 3 4
 3 3 5
+
+5 7 3 1 1
+1 1
+1 2 2
+2 3 3
+3 4 4
+
+5 7 1 1 1
+1 1
+1 2 2
 '''
 
 def print_status():
@@ -186,11 +198,10 @@ def print_status():
     print()
 
 def play():
-    for _ in range(M):
+    for t in range(M):
         # 루돌프 이동
         target_p = get_nearest_santa()
         move_rudolf(target_p)
-
         # 산타 이동
         move_santas()
 
