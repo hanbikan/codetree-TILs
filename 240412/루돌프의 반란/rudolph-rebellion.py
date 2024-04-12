@@ -111,42 +111,43 @@ def move_santas():
         if mapp[nsx][nsy] == RUDOLF:
             # 산타 밀려남
             csx, csy = sx + rdx * (D - 1), sy + rdy * (D - 1)
-            offset = 0
-            to_move = []
-            while True:
-                cur_x, cur_y = csx + rdx * offset, csy + rdy * offset
-                if not in_range(cur_x, cur_y):
-                    break
-                if mapp[cur_x][cur_y] >= 1:
-                    to_move.append(mapp[cur_x][cur_y])
-                    offset += 1
-                else:
-                    break
+            if not (csx == sx and csy == sy):
+                offset = 0
+                to_move = []
+                while True:
+                    cur_x, cur_y = csx + rdx * offset, csy + rdy * offset
+                    if not in_range(cur_x, cur_y):
+                        break
+                    if mapp[cur_x][cur_y] >= 1:
+                        to_move.append(mapp[cur_x][cur_y])
+                        offset += 1
+                    else:
+                        break
 
-            # 뒤에 있는 산타부터 이동
-            for i in range(len(to_move) - 1, -1, -1):
-                p_to_move = to_move[i]
-                px, py = s_pos[p_to_move]
-                pnx, pny = px + rdx, py + rdy
-                if not in_range(pnx, pny):
-                    p_to_remove.append(p_to_move)
-                else:
-                    mapp[pnx][pny] = mapp[px][py]
-                    s_pos[p_to_move] = [pnx, pny]
+                # 뒤에 있는 산타부터 이동
+                for i in range(len(to_move) - 1, -1, -1):
+                    p_to_move = to_move[i]
+                    px, py = s_pos[p_to_move]
+                    pnx, pny = px + rdx, py + rdy
+                    if not in_range(pnx, pny):
+                        p_to_remove.append(p_to_move)
+                    else:
+                        mapp[pnx][pny] = mapp[px][py]
+                        s_pos[p_to_move] = [pnx, pny]
 
             if not in_range(csx, csy):
                 mapp[sx][sy] = EMPTY
                 p_to_remove.append(p)
             else:
-                mapp[csx][csy] = p
                 mapp[sx][sy] = EMPTY
+                mapp[csx][csy] = p
                 s_pos[p] = [csx, csy]
 
             status[p] = 2 # 기절
             scores[p] += D # 점수
         else:
-            mapp[nsx][nsy] = p
             mapp[sx][sy] = EMPTY
+            mapp[nsx][nsy] = p
             s_pos[p] = [nsx, nsy]
 
     for p in p_to_remove:
@@ -193,12 +194,12 @@ def play():
         # 산타 이동
         move_santas()
 
+        if len(s_pos) == 0:
+            break
+
         for p in s_pos.keys():
             scores[p] += 1 # 살아있는 산타 점수 추가
             status[p] = max(0, status[p] - 1) # 상태 변경
-
-        if len(s_pos) == 0:
-            break
 
     to_print = [0] * P
     for p, score in scores.items():
