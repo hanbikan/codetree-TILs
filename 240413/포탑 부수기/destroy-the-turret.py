@@ -116,7 +116,7 @@ def select_target(attacker):
     candidate = None
     min_y = float('inf')
     for x, y in candidates:
-        if y > min_y:
+        if y < min_y:
             min_y = y
             candidate = [x,y]
     
@@ -183,6 +183,7 @@ for t in range(1, K + 1):
     attacker = select_attacker()
     mapp[attacker[0]][attacker[1]] += N + M
     attacked_at[attacker[0]][attacker[1]] = t
+
     # 타겟 선정
     target = select_target(attacker)
 
@@ -197,6 +198,15 @@ for t in range(1, K + 1):
     if not attack_raiser(attacker, target):
         # 포탄 공격
         attack_fire(attacker, target)
+    
+    # 부서지지 않은 포탑 1개가 되면 종료
+    zero_count = 0
+    for i in range(N):
+        for j in range(M):
+            if mapp[i][j] == 0:
+                zero_count += 1
+    if zero_count == N * M - 1:
+        break
 
     # 정비(공격과 부관한 포탑 +1)
     for p in not_attacked:
@@ -204,6 +214,8 @@ for t in range(1, K + 1):
             continue
         x, y = p // N, p % N
         mapp[x][y] += 1
+
+    #print_status()
 
 # 가장 강한 포탑 공격력 출력
 maxx = -1
