@@ -1,52 +1,26 @@
+import heapq
+
+class Rabbit:
+    def __init__(self, x, y, jump, pid):
+        self.x = x
+        self.y = y
+        self.jump = jump
+        self.pid = pid
+    
+    def __lt__(self, other):
+        if self.jump != other.jump:
+            return self.jump < other.jump
+        if self.x + self.y != other.x + other.y: 
+            return self.x + self.y < other.x + other.y
+        if self.x != other.x:
+            return self.x < other.x
+        if self.y != other.y:
+            return self.y < other.y
+        return self.pid < other.pid
+
 d_pos = [
     [0,1],[1,0],[0,-1],[-1,0]
 ]
-
-def select_to_move():
-    # 현재까지의 총 점프 횟수가 적은 토끼
-    candidate = 0
-    min_jump_count = float('inf')
-    min_sum = float('inf')
-    min_x = float('inf')
-    min_y = float('inf')
-    min_pid = float('inf')
-    for pid, count in jump_count.items():
-        x, y = position[pid]
-        if count < min_jump_count:
-            candidate = pid
-            min_jump_count = count
-            min_sum = x + y
-        elif count == min_jump_count:
-            # 현재 서있는 행 번호 + 열 번호가 작은 토끼
-            if x + y < min_sum:
-                candidate = pid
-                min_sum = x + y
-                min_x = x
-            elif x + y == min_sum:
-                # 행 번호가 작은 토끼
-                if x < min_x:
-                    candidate = pid
-                    min_x = x
-                    min_y = y
-                elif x == min_x:
-                    # 열 번호가 작은 토끼
-                    if y < min_y:
-                        candidate = pid
-                        min_y = y
-                        min_pid = pid
-                    elif y == min_y:
-                        if pid < min_pid:
-                            candidate = pid
-                            min_pid = pid
-
-    return candidate
-    
-    # 고유번호가 작은 토끼
-    min_pid = float('inf')
-    for pid in candidates:
-        if pid < min_pid:
-            min_pid = pid
-    return min_pid
 
 def in_range(x, y):
     return 0 <= x <= N - 1 and 0 <= y <= M - 1
@@ -80,10 +54,10 @@ def get_out_position(x, y, d_index):
             else:
                 return [x, diff % M]
 
-def get_next_positions(pid):
+def get_next_positions(rabbit):
     result = []
-    x, y = position[pid]
-    d = dist[pid]
+    x, y = rabbit.x, rabbit.y
+    d = dist[rabbit.pid]
     for k in range(4):
         dx, dy = d_pos[k]
         nx, ny = x + dx * d[0], y + dy * d[1]
@@ -127,68 +101,31 @@ def select_position(positions):
             candidate = [x,y]
     return candidate
 
-def select_to_bonus(selected):
-    # 현재 서있는 행 번호 + 열 번호가 큰 토끼
-    candidates = []
-    max_sum = -1
-    for pid in selected:
-        x, y = position[pid]
-        if x + y > max_sum:
-            max_sum = x + y
-            candidates = [pid]
-        elif x + y == max_sum:
-            candidates.append(pid)
-    if len(candidates) == 1:
-        return candidates[0]
-    
-    # 행 번호가 큰 토끼
-    next_candidates = []
-    max_x = -1
-    for pid in candidates:
-        x, y = position[pid]
-        if x > max_x:
-            max_x = x
-            candidates = [pid]
-        elif x == max_x:
-            candidates.append(pid)
-    candidates = next_candidates
-    if len(candidates) == 1:
-        return candidates[0]
-    
-    # 열 번호가 큰 토끼
-    next_candidates = []
-    max_y = -1
-    for pid in candidates:
-        x, y = position[pid]
-        if y > max_y:
-            max_y = y
-            candidates = [pid]
-        elif x == max_y:
-            candidates.append(pid)
-    candidates = next_candidates
-    if len(candidates) == 1:
-        return candidates[0]
-    
-    # 고유번호가 큰 토끼
-    max_pid = 0
-    for pid in candidates:
-        if pid > max_pid:
-            max_pid = pid
-    return max_pid
+def compare(r1, r2):
+    if r1.x + r1.y != r2.x + r2.y:
+        return r1.x + r1.y > r2.x + r2.y
+    if r1.x != r2.x:
+        return r1.x > r2.x
+    if r1.y != r2.y:
+        return r1.y > r2.y
+    return r1.pid > r2.pid
 
 def play(): # 2000
     global score_to_add
     # K번 반복
-    selected = set()
+    selected = []
     for _ in range(K): # 100
         # 이동
-        pid_to_move = select_to_move() # 2000
-        selected.add(pid_to_move)
-        jump_count[pid_to_move] += 1
+        rabbit_to_move = heapq.heappop(rabbits)
+        pid_to_move = rabbit_to_move.pid
+        heapq.heappush(selected, rabbit_to_move)
+        rabbit_to_move.jump += 1
     
-        next_positions = get_next_positions(pid_to_move) # 4
+        next_positions = get_next_positions(rabbit_to_move) # 4
         x, y = select_position(next_positions)
-        position[pid_to_move] = [x,y]
+        rabbit_to_move.x = x
+        rabbit_to_move.y = y
+        heapq.heappush(rabbits, rabbit_to_move)
 
         # 스코어 올리기
         to_add = x + y + 2
@@ -200,14 +137,17 @@ def play(): # 2000
         #print("jump", jump_count)
         #print()
     # 우선순위 높은 토끼 +S(단, K번 반복하는 동안 1번이라도 뽑힌 적 있는 토끼여야 함)
-    pid_for_bonus = select_to_bonus(selected)
-    score[pid_for_bonus] += S
+    bonus_rabbit = Rabbit(0, 0, 0, 0)
+    while selected:
+        cur = heapq.heappop(selected)
+        if compare(cur, bonus_rabbit):
+            bonus_rabbit = cur
+    score[bonus_rabbit.pid] += S
 
 
 dist = {}
 score = {}
-jump_count = {}
-position = {}
+rabbits = []
 score_to_add = 0
 
 Q = int(input())
@@ -220,8 +160,7 @@ for t in range(1, Q + 1):
             pid, d = order[i], order[i + 1]
             dist[pid] = [d % (N * 2 - 2), d % (M * 2 - 2)]
             score[pid] = 0
-            jump_count[pid] = 0
-            position[pid] = [0,0]
+            heapq.heappush(rabbits, Rabbit(0, 0, 0, pid))
     elif order[0] == 200:
         # 경주 진행
         K, S = order[1], order[2]
