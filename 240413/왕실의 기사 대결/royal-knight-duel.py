@@ -21,7 +21,7 @@ def init_knight_map():
             for j in range(w):
                 knight_map[x + i][y + j] = k
 
-def move(knight_index, dir_index, start_knight_index):
+def move(knight_index, dir_index):
     to_move = set()
     x, y, h, w, hp = knights[knight_index]
     dx, dy = d_pos[dir_index]
@@ -37,16 +37,11 @@ def move(knight_index, dir_index, start_knight_index):
                 to_move.add(knight_map[nx][ny])
     
     for next_knight_index in to_move:
-        res = move(next_knight_index, dir_index, start_knight_index)
+        res = move(next_knight_index, dir_index)
         if res == False:
             return False
     
-    # 업데이트
-    knights[knight_index][X] = x + dx
-    knights[knight_index][Y] = y + dy
-    init_knight_map()
-    if knight_index != start_knight_index:
-        update_hp(knight_index)
+    affected[knight_index] = [x + dx, y + dy]
 
     return True
 
@@ -66,10 +61,18 @@ def update_hp(knight_index):
 def print_status():
     print("KNIGHT_MAP")
     for i in range(L):
-        print(*knight_map[i])
+        for j in range(L):
+            if mapp[i][j] == WALL:
+                print("@", end=" ")
+                continue
+            print(knight_map[i][j], end="")
+            if mapp[i][j] == TRAP:
+                print("!", end="")
+            print(" ", end="")
+        print()
     print("HP")
     for i in range(1, N + 1):
-        print(i, " = ", knights[i][HP])
+        print(i, "=", knights[i][HP], original_hp[i])
 
 # L: 체스판 크기, N: 기사 수, Q: 명령 수
 L, N, Q = map(int,input().split())
@@ -90,7 +93,14 @@ for t in range(Q):
     if hp == 0:
         continue
 
-    move(i, d, i)
+    affected = {} # affected[1] = [new_x, new_y]
+    if move(i, d):
+        for knight_index, (new_x, new_y) in affected.items():
+            knights[knight_index][X] = new_x
+            knights[knight_index][Y] = new_y
+            if knight_index != i:
+                update_hp(knight_index)
+        init_knight_map()
 
 result = 0
 for k in range(1, N + 1):
