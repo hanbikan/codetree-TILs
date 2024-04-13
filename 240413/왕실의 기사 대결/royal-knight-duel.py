@@ -2,7 +2,7 @@ X, Y, H, W, HP = 0, 1, 2, 3, 4
 EMPTY, TRAP, WALL = 0, 1, 2
 
 d_pos = [
-    [-1,0],[0,1],[1,0],[0,-1]
+    [-1,0],[0,1],[1,0],[0,-1] # 상 우 하 좌
 ]
 
 def in_range(x, y):
@@ -33,9 +33,10 @@ def move(knight_index, dir_index, start_knight_index):
             if not in_range(nx, ny) or mapp[nx][ny] == WALL:
                 return False
             cur = knight_map[nx][ny]
-            if cur != 0 and cur != knight_index:
-                to_move.add(knight_map[nx][ny])
+            if cur != 0 and cur != knight_index: # 다른 기사가 있음
+                to_move.add(cur)
     
+    # 재귀: 한 번이라도 실패 시 아무것도 안 함
     for next_knight_index in to_move:
         res = move(next_knight_index, dir_index, start_knight_index)
         if res == False:
@@ -46,17 +47,38 @@ def move(knight_index, dir_index, start_knight_index):
     knights[knight_index][Y] = y + dy
     init_knight_map()
     if knight_index != start_knight_index:
-        update_hp(knight_index)
+        update_hp(knight_index, dir_index)
 
     return True
 
-def update_hp(knight_index):
+def update_hp(knight_index, dir_index):
     x, y, h, w, hp = knights[knight_index]
     if hp == 0:
         return
-    for i in range(h):
+    if dir_index == 0: # 상
         for j in range(w):
-            if mapp[x + i][y + j] == TRAP:
+            if mapp[x][y + j] == TRAP:
+                knights[knight_index][HP] -= 1
+                if knights[knight_index][HP] == 0:
+                    init_knight_map()
+                    return
+    if dir_index == 1: # 우
+        for i in range(h):
+            if mapp[x + i][y + w - 1] == TRAP:
+                knights[knight_index][HP] -= 1
+                if knights[knight_index][HP] == 0:
+                    init_knight_map()
+                    return
+    if dir_index == 2: # 하
+        for j in range(w):
+            if mapp[x + h - 1][y + j] == TRAP:
+                knights[knight_index][HP] -= 1
+                if knights[knight_index][HP] == 0:
+                    init_knight_map()
+                    return
+    if dir_index == 3: # 좌
+        for i in range(h):
+            if mapp[x + i][y] == TRAP:
                 knights[knight_index][HP] -= 1
                 if knights[knight_index][HP] == 0:
                     init_knight_map()
@@ -66,9 +88,9 @@ def print_status():
     print("KNIGHT_MAP")
     for i in range(L):
         print(*knight_map[i])
-    print("HP")
-    for i in range(1, N + 1):
-        print(i, " = ", knights[i][HP])
+    #print("HP")
+    #for i in range(1, N + 1):
+    #    print(i, "=", knights[i][HP], "(", knights[i][HP] - original_hp[i], ")")
 
 # L: 체스판 크기, N: 기사 수, Q: 명령 수
 L, N, Q = map(int,input().split())
