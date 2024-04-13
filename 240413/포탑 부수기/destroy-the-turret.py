@@ -132,10 +132,10 @@ def attack_raiser(attacker, target):
     distances[attacker[0]][attacker[1]] = 0
 
     q = [[0, attacker, []]] # dist, node, route
-    heapq.heapify(q)
+    #heapq.heapify(q)
 
     while len(q) > 0:
-        cur_dist, cur_pos, cur_route = heapq.heappop(q)
+        cur_dist, cur_pos, cur_route = q.pop(0)#heapq.heappop(q)
         for dx, dy in d_pos_4:
             nx, ny = cur_pos[0] + dx, cur_pos[1] + dy
             if not in_range(nx, ny):
@@ -151,7 +151,8 @@ def attack_raiser(attacker, target):
                 return True
         
             if cur_dist + 1 < distances[nx][ny]:
-                heapq.heappush(q, [cur_dist + 1, [nx, ny], cur_route + [[nx,ny]]])
+                #heapq.heappush(q, [cur_dist + 1, [nx, ny], cur_route + [[nx,ny]]])
+                q.append([cur_dist + 1, [nx, ny], cur_route + [[nx,ny]]])
                 distances[nx][ny] = cur_dist + 1
     
     return False
