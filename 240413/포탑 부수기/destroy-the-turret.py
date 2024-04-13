@@ -1,5 +1,3 @@
-import heapq
-
 d_pos_4 = [
     [0,1],[1,0],[0,-1],[-1,0]
 ]
@@ -132,10 +130,9 @@ def attack_raiser(attacker, target):
     distances[attacker[0]][attacker[1]] = 0
 
     q = [[0, attacker, []]] # dist, node, route
-    #heapq.heapify(q)
 
     while len(q) > 0:
-        cur_dist, cur_pos, cur_route = q.pop(0)#heapq.heappop(q)
+        cur_dist, cur_pos, cur_route = q.pop(0)
         for dx, dy in d_pos_4:
             nx, ny = cur_pos[0] + dx, cur_pos[1] + dy
             if not in_range(nx, ny):
@@ -151,7 +148,6 @@ def attack_raiser(attacker, target):
                 return True
         
             if cur_dist + 1 < distances[nx][ny]:
-                #heapq.heappush(q, [cur_dist + 1, [nx, ny], cur_route + [[nx,ny]]])
                 q.append([cur_dist + 1, [nx, ny], cur_route + [[nx,ny]]])
                 distances[nx][ny] = cur_dist + 1
     
@@ -165,7 +161,7 @@ def attack_fire(attacker, target):
         nx, ny = target[0] + dx, target[1] + dy
         if not in_range(nx, ny):
             nx, ny = (nx + N) % N, (ny + M) % M
-        if mapp[nx][ny] == 0:
+        if mapp[nx][ny] == 0 or [nx, ny] == attacker:
             continue
         attack([nx, ny], damage // 2)
 
@@ -173,6 +169,9 @@ def print_status():
     print(attacker, target)
     for i in range(N):
         print(*mapp[i])
+    print()
+    for i in range(N):
+        print(*attacked_at[i])
     print()
 
 N, M, K = map(int,input().split())
@@ -183,7 +182,6 @@ for t in range(1, K + 1):
     # 공격자 선정
     attacker = select_attacker()
     mapp[attacker[0]][attacker[1]] += N + M
-    attacked_at[attacker[0]][attacker[1]] = t
 
     # 타겟 선정
     target = select_target(attacker)
@@ -200,6 +198,7 @@ for t in range(1, K + 1):
     if not attack_raiser(attacker, target):
         # 포탄 공격
         attack_fire(attacker, target)
+    attacked_at[attacker[0]][attacker[1]] = t
     
     # 부서지지 않은 포탑 1개가 되면 종료
     zero_count = 0
@@ -215,7 +214,7 @@ for t in range(1, K + 1):
         x, y = p // M, p % M
         mapp[x][y] += 1
 
-    #print_status()
+    # print_status()
 
 # 가장 강한 포탑 공격력 출력
 maxx = -1
