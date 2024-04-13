@@ -46,37 +46,13 @@ def move(knight_index, dir_index, start_knight_index):
     knights[knight_index][Y] = y + dy
     init_knight_map()
     if knight_index != start_knight_index:
-        update_hp(knight_index, dir_index)
+        update_hp(knight_index)
 
     return True
 
-def update_hp(knight_index, dir_index):
+def update_hp(knight_index):
     x, y, h, w, hp = knights[knight_index]
     if hp == 0:
-        return
-
-    flag = False
-    if dir_index == 0: # 상
-        for j in range(w):
-            if mapp[x][y + j] == TRAP:
-                flag = True
-                break
-    elif dir_index == 1: # 우
-        for i in range(h):
-            if mapp[x + i][y + w - 1] == TRAP:
-                flag = True
-                break
-    elif dir_index == 2: # 하
-        for j in range(w):
-            if mapp[x + h - 1][y + j] == TRAP:
-                flag = True
-                break
-    else: # 좌
-        for i in range(h):
-            if mapp[x + i][y] == TRAP:
-                flag = True
-                break
-    if not flag:
         return
 
     for i in range(h):
