@@ -21,7 +21,7 @@ def init_knight_map():
             for j in range(w):
                 knight_map[x + i][y + j] = k
 
-def move(knight_index, dir_index):
+def move(knight_index, dir_index, start_knight_index):
     to_move = set()
     x, y, h, w, hp = knights[knight_index]
     dx, dy = d_pos[dir_index]
@@ -37,24 +37,30 @@ def move(knight_index, dir_index):
                 to_move.add(knight_map[nx][ny])
     
     for next_knight_index in to_move:
-        if move(next_knight_index, dir_index) == False:
+        res = move(next_knight_index, dir_index, start_knight_index)
+        if res == False:
             return False
     
     # 업데이트
     knights[knight_index][X] = x + dx
     knights[knight_index][Y] = y + dy
     init_knight_map()
+    if knight_index != start_knight_index:
+        update_hp(knight_index)
 
-    return to_move
+    return True
 
 def update_hp(knight_index):
     x, y, h, w, hp = knights[knight_index]
+    if hp == 0:
+        return
     for i in range(h):
         for j in range(w):
             if mapp[x + i][y + j] == TRAP:
                 knights[knight_index][HP] -= 1
                 if knights[knight_index][HP] == 0:
                     init_knight_map()
+                    return
 
 def print_status():
     print("KNIGHT_MAP")
@@ -83,10 +89,7 @@ for t in range(Q):
     if hp == 0:
         continue
 
-    res = move(i, d)
-    if res != False:
-        for knight_index in res:
-            update_hp(knight_index)
+    move(i, d, i)
 
 result = 0
 for k in range(1, N + 1):
