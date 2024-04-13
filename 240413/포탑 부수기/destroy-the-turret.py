@@ -124,7 +124,7 @@ def select_target(attacker):
 
 def attack(target, damage):
     mapp[target[0]][target[1]] = max(0, mapp[target[0]][target[1]] - damage)
-    not_attacked.discard(target[0]*N + target[1])
+    not_attacked.discard(target[0]*M + target[1])
 
 def attack_raiser(attacker, target):
     # dijkstra
@@ -192,7 +192,7 @@ for t in range(1, K + 1):
     for i in range(N):
         for j in range(M):
             if mapp[i][j] == 0: continue
-            not_attacked.add(i*N + j)
+            not_attacked.add(i*M + j)
     
     # 레이저 공격
     if not attack_raiser(attacker, target):
@@ -212,7 +212,7 @@ for t in range(1, K + 1):
     for p in not_attacked:
         if p == attacker[0]*N + attacker[1]:
             continue
-        x, y = p // N, p % N
+        x, y = p // M, p % M
         mapp[x][y] += 1
 
     #print_status()
