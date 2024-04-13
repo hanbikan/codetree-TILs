@@ -30,9 +30,9 @@ def move(knight_index, dir_index):
     for i in range(h):
         for j in range(w):
             nx, ny = x + i + dx, y + j + dy
-            cur = knight_map[nx][ny]
             if not in_range(nx, ny) or mapp[nx][ny] == WALL:
                 return False
+            cur = knight_map[nx][ny]
             if cur != 0 and cur != knight_index:
                 to_move.add(knight_map[nx][ny])
     
