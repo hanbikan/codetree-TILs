@@ -31,28 +31,32 @@ def get_out_position(x, y, d_index):
         if x < 0:
             diff = -x
             if diff <= N - 1:
-                return [diff % N, y]
+                return [diff, y]
             else:
+                diff -= N - 1
                 return [N - 1 - diff, y]
         else:
             diff = x - (N - 1)
             if diff <= N - 1:
                 return [N - 1 - diff, y]
             else:
-                return [diff % N, y]
+                diff -= N - 1
+                return [diff, y]
     if not (0 <= y <= M - 1):
         if y < 0:
             diff = -y
             if diff <= M - 1:
-                return [x, diff % M]
+                return [x, diff]
             else:
+                diff -= M - 1
                 return [x, M - 1 - diff]
         else:
             diff = y - (M - 1)
             if diff <= M - 1:
                 return [x, M - 1 - diff]
             else:
-                return [x, diff % M]
+                diff -= M - 1
+                return [x, diff]
 
 def get_next_rabbits(rabbit):
     result = []
