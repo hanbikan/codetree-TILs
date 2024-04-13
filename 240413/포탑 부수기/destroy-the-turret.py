@@ -192,6 +192,7 @@ for t in range(1, K + 1):
     for i in range(N):
         for j in range(M):
             if mapp[i][j] == 0: continue
+            if [i,j] == attacker: continue
             not_attacked.add(i*M + j)
     
     # 레이저 공격
@@ -210,8 +211,6 @@ for t in range(1, K + 1):
 
     # 정비(공격과 부관한 포탑 +1)
     for p in not_attacked:
-        if p == attacker[0]*N + attacker[1]:
-            continue
         x, y = p // M, p % M
         mapp[x][y] += 1
 
