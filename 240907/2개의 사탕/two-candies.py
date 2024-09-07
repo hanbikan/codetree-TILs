@@ -6,7 +6,7 @@ X,Y=0,1
 
 def forward(d, p):
     x, y = p
-    while mapp[x + dx[d]][y + dy[d]] != '#' and (x + dx[d],y + dy[d]) != b and (x + dx[d],y + dy[d]) != r:
+    while mapp[x+dx[d]][y+dy[d]] != '#' and (x+dx[d],y+dy[d]) != b and (x+dx[d],y+dy[d]) != r:
         x += dx[d]
         y += dy[d]
     if (x,y) == o:
@@ -54,11 +54,11 @@ def f(depth):
     result = float('inf')
     for k in range(4):
         pb, pr = b, r
-        #print(depth, k, r, b)
         if tilt(k):
-            #print("!", depth, k, r, b)
             b, r = pb, pr
             return depth
+        if b == (-1,-1):
+            continue
         if pb == b and pr == r:
             continue
         result = min(result, f(depth + 1))
