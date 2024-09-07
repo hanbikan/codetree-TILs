@@ -57,11 +57,10 @@ def f(depth):
         if tilt(k):
             b, r = pb, pr
             return depth
-        if b == (-1,-1):
-            continue
         if pb == b and pr == r:
             continue
-        result = min(result, f(depth + 1))
+        if b != (-1,-1):
+            result = min(result, f(depth + 1))
         b, r = pb, pr
     return result
 
