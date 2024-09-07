@@ -9,6 +9,8 @@ def forward(d, p):
     while mapp[x+dx[d]][y+dy[d]] != '#' and (x+dx[d],y+dy[d]) != b and (x+dx[d],y+dy[d]) != r:
         x += dx[d]
         y += dy[d]
+        if mapp[x][y] == 'O':
+            return (-1,-1)
     if (x,y) == o:
         return (-1,-1)
     return (x,y)
