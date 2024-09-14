@@ -58,7 +58,7 @@ def dfs(move_index, score):
     for i in range(4):
         next_node = try_move_and_get_node(cur_nodes[i], moves[move_index])
         # next_node에 말이 있는지 체크
-        if cur_nodes.count(next_node) >= 1:
+        if next_node != DESTINATION and cur_nodes.count(next_node) >= 1:
             continue
         back = cur_nodes[i]
         cur_nodes[i] = next_node
@@ -67,6 +67,7 @@ def dfs(move_index, score):
 
 
 NEXT_NODES, SCORE = 0, 1
+START, DESTINATION = 0, 21
 moves = list(map(int,input().split()))
 graph = init_graph()
 
