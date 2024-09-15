@@ -26,14 +26,14 @@ px, py = N//2, N//2
 route = []
 cx, cy = px, py
 cd = 0
-for p in range(1, 6+1):
+for p in range(1, N):
     for _ in range(2):
         route_in_line = get_route_in_line(cx, cy, cd, p)
         route += route_in_line
         cx, cy = route_in_line[-1]
         cd = (cd + 1) % 4
 route += get_route_in_line(cx, cy, cd, N-1)
-
+#print(route)
 score = 0
 for _ in range(M):
     D, P = map(int,input().split())
