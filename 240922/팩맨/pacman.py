@@ -34,24 +34,8 @@ def get_monsters_at(x,y):
             res.append(i)
     return res
 
-def get_max_eat_count(x,y,moved,eat_count):
-    if moved == 3:
-        return eat_count
-    result = 0
-    for k in range(4):
-        nx, ny = x + dpx[k], y + dpy[k]
-        if not in_range(nx,ny):
-            continue
-        next_eat_count = eat_count
-        if not is_visited[nx][ny]:
-            next_eat_count += len(get_monsters_at(nx,ny))
-        is_visited[nx][ny] = True
-        result = max(result, get_max_eat_count(nx,ny,moved+1,next_eat_count))
-        is_visited[nx][ny] = False
-    return result
-
-def get_ate(x,y,moved,ate):
-    global px, py
+def set_max_ate(x,y,moved,ate):
+    global px, py, max_ate
     for k in range(4):
         nx, ny = x + dpx[k], y + dpy[k]
         if not in_range(nx,ny):
@@ -63,31 +47,27 @@ def get_ate(x,y,moved,ate):
         
         next_moved = moved + 1
         if next_moved == 3:
-            if len(next_ate) == max_eat_count:
+            if len(next_ate) > len(max_ate):
+                max_ate = next_ate
                 px = nx
                 py = ny
-                return next_ate
         else:
             is_visited[nx][ny] = True
-            res = get_ate(nx,ny,next_moved,next_ate)
+            set_max_ate(nx,ny,next_moved,next_ate)
             is_visited[nx][ny] = False
-            if res != []:
-                return res
-    return []
 
 def move_pacman():
-    global px, py, max_eat_count, M, is_visited
-    # get max eat count
-    is_visited = [[False]*4 for _ in range(4)]
-    max_eat_count = get_max_eat_count(px,py,0,0)
-
+    global px, py, is_visited, max_ate
     # get highest priority moves
     is_visited = [[False]*4 for _ in range(4)]
-    ate = get_ate(px,py,0,[])
-    ate.sort(reverse=True)
-    #print(max_eat_count, ate)
+    
+    max_ate = []
+    set_max_ate(px,py,0,[])
 
-    for mi in ate:
+    max_ate.sort(reverse=True)
+    #print(max_ate)
+
+    for mi in max_ate:
         bodies.append([monsters[mi][0], monsters[mi][1], 3])
         monsters.pop(mi)
 
@@ -130,6 +110,7 @@ for _ in range(T):
     #print("bodies=", bodies)
     for egg in eggs:
         monsters.append(egg)
+    #print("=================")
     #print("pacman=",px, py)
     #print("monsters=", M, sorted(monsters))
     #print("bodies=",sorted(bodies))
