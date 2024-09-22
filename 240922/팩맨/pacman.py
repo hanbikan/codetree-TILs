@@ -29,7 +29,7 @@ def move_monster(mi):
 
 def get_monster_count_at(x,y):
     res = 0
-    for i in range(M):
+    for i in range(len(monsters)):
         if x == monsters[i][0] and y == monsters[i][1]:
             res += 1
     return res
@@ -80,7 +80,7 @@ def move_pacman():
     to_remove = set()
     for k in pacman_dirs:
         px, py = px + dpx[k], py + dpy[k]
-        for i in range(M):
+        for i in range(len(monsters)):
             bx,by,_ = monsters[i]
             if px == bx and py == by:
                 to_remove.add(i)
@@ -89,7 +89,6 @@ def move_pacman():
     for mi in to_remove:
         bodies.append((monsters[mi][0], monsters[mi][1], 3))
         monsters.pop(mi)
-    M -= len(to_remove)
 
 def remove_bodies():
     to_remove = []
@@ -119,7 +118,7 @@ for _ in range(T):
     #print("================================")
     eggs = monsters.copy()
 
-    for i in range(M):
+    for i in range(len(monsters)):
         move_monster(i)
     #print("monsters=", M, monsters)
     
@@ -130,9 +129,8 @@ for _ in range(T):
     #print("bodies=", bodies)
     for egg in eggs:
         monsters.append(egg)
-    M += len(eggs)
     #print("pacman=",px, py)
     #print("monsters=", M, monsters)
     #print("bodies=",bodies)
 
-print(M)
+print(len(monsters))
