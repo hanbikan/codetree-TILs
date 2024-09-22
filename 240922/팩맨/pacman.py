@@ -7,32 +7,31 @@ dpy = [0,-1,0,1]
 def in_range(x,y):
     return 0 <= x < 4 and 0 <= y < 4
 
-def is_there_any_body(x,y):
-    for bx,by,_ in bodies:
-        if x == bx and y == by:
-            return True
-    return False
-
-def move_monster(mi):
-    x, y, d = monsters[mi]
-    for k in range(8):
-        cur_d = (d + k) % 8
-        nx, ny = x + dx[cur_d], y + dy[cur_d]
-        if not in_range(nx,ny):
-            continue
-        if is_there_any_body(nx,ny):
-            continue
-        if nx == px and ny == py:
-            continue
-        monsters[mi] = [nx,ny,cur_d]
-        break
-
-def get_monsters_at(x,y):
-    res = []
-    for i in range(len(monsters)):
-        if x == monsters[i][0] and y == monsters[i][1]:
-            res.append(i)
-    return res
+def move_monsters():
+    global monsters
+    new_monsters = [[[0]*8 for _ in range(4)] for _ in range(4)]
+    for x in range(4):
+        for y in range(4):
+            for k in range(8):
+                if monsters[x][y][k] == 0:
+                    continue
+                moved = False
+                for add_k in range(8):
+                    cur_k = (k + add_k) % 8
+                    nx, ny = x + dx[cur_k], y + dy[cur_k]
+                    if not in_range(nx,ny):
+                        continue
+                    if bodies[nx][ny] > 0:
+                        continue
+                    if nx == px and ny == py:
+                        continue
+                    new_monsters[nx][ny][cur_k] += monsters[x][y][k]
+                    #print(x,y,k,nx,ny,cur_k)
+                    moved = True
+                    break
+                if not moved:
+                    new_monsters[x][y] += 1
+    monsters = new_monsters
 
 def set_max_ate(x,y,moved,ate):
     global px, py, max_ate
@@ -43,11 +42,17 @@ def set_max_ate(x,y,moved,ate):
         
         next_ate = ate.copy()
         if not is_visited[nx][ny]:
-            next_ate += get_monsters_at(nx,ny)
+            for k2 in range(8):
+                if monsters[nx][ny][k2] == 0:
+                    continue
+                next_ate.append([nx,ny,k2,monsters[nx][ny][k2]])
         
         next_moved = moved + 1
         if next_moved == 3:
-            if len(next_ate) > len(max_ate):
+            summ = 0
+            for _,_,_,cnt in next_ate:
+                summ += cnt
+            if summ > len(max_ate):
                 max_ate = next_ate
                 px = nx
                 py = ny
@@ -57,62 +62,76 @@ def set_max_ate(x,y,moved,ate):
             is_visited[nx][ny] = False
 
 def move_pacman():
-    global px, py, is_visited, max_ate
-    # get highest priority moves
+    global px, py, is_visited, max_ate, monsters
+
     is_visited = [[False]*4 for _ in range(4)]
-    
-    max_ate = []
+    max_ate = [] # x,y,dir,cnt
     set_max_ate(px,py,0,[])
 
-    max_ate.sort(reverse=True)
-    #print(max_ate)
-
-    for mi in max_ate:
-        bodies.append([monsters[mi][0], monsters[mi][1], 3])
-        monsters.pop(mi)
+    for x,y,_,_ in max_ate:
+        bodies[x][y] = 3
+        for k in range(8):
+            monsters[x][y][k] = 0
 
 def remove_bodies():
-    to_remove = []
-    for i in range(len(bodies)):
-        bodies[i][2] -= 1
-        if bodies[i][2] == 0:
-            to_remove.append(i)
-    to_remove.sort(reverse=True)
-    for i in to_remove:
-        bodies.pop(i)
+    global bodies
+
+    for i in range(4):
+        for j in range(4):
+            bodies[i][j] = max(0, bodies[i][j] - 1)
 
 M, T = map(int,input().split())
 px, py = map(int,input().split())
 px -= 1
 py -= 1
 
-monsters = [] # x,y,d
-for _ in range(M):
+monsters = [[[0]*8 for _ in range(4)] for _ in range(4)]
+for i in range(M):
     x,y,d = map(int,input().split())
     x -= 1
     y -= 1
     d -= 1
-    monsters.append([x,y,d])
+    monsters[x][y][d] += 1
 
-bodies = [] # x,y,life(0 to removed)
+bodies = [[0]*4 for _ in range(4)] # x,y,life(0 to removed)
 for _ in range(T):
-    #print("================================")
     eggs = monsters.copy()
-
-    for i in range(len(monsters)):
-        move_monster(i)
-    #print("monsters=", M, monsters)
+    move_monsters()
+    #print("======================")
+    #for i in range(4):
+    #    for j in range(4):
+    #        print(monsters[i][j], end=" ")
+    #    print()
     
     move_pacman()
+    #print("PAC", px, py)
     remove_bodies()
+    #print("BODIES", bodies)
 
-    #print("monsters=", M, monsters)
-    #print("bodies=", bodies)
-    for egg in eggs:
-        monsters.append(egg)
-    #print("=================")
-    #print("pacman=",px, py)
-    #print("monsters=", M, sorted(monsters))
-    #print("bodies=",sorted(bodies))
+    for i in range(4):
+        for j in range(4):
+            for k in range(8):
+                monsters[i][j][k] += eggs[i][j][k]
+    #        print(monsters[i][j], end=" ")
+    #    print()
 
-print(len(monsters))
+summ = 0
+for i in range(4):
+    for j in range(4):
+        for k in range(8):
+            summ += monsters[i][j][k]
+print(summ)
+
+'''
+9 20
+1 1
+3 1 5
+1 3 8
+3 2 7
+3 4 1
+2 3 7
+2 4 2
+2 1 2
+3 1 6
+3 3 7
+'''
