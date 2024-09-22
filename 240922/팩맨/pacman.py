@@ -57,11 +57,15 @@ def get_pacman_dirs(x,y,moved,eat_count,dirs):
         nx, ny = x + dpx[k], y + dpy[k]
         if not in_range(nx,ny):
             continue
-        next_eat_count = eat_count + get_monster_count_at(nx,ny)
+        next_eat_count = eat_count
+        if not is_visited[nx][ny]:
+            next_eat_count += get_monster_count_at(nx,ny)
+        is_visited[nx][ny] = True
         next_dirs = dirs+[k]
         if next_eat_count == max_eat_count:
             return next_dirs
         res = get_pacman_dirs(nx,ny,moved+1,next_eat_count,next_dirs)
+        is_visited[nx][ny] = False
         if res != False:
             return res
     return False
@@ -73,6 +77,7 @@ def move_pacman():
     max_eat_count = get_max_eat_count(px,py,0,0)
 
     # get highest priority moves
+    is_visited = [[False]*4 for _ in range(4)]
     pacman_dirs = get_pacman_dirs(px,py,0,0,[])
     #print("PD", pacman_dirs, max_eat_count)
 
