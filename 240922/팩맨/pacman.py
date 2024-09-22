@@ -52,7 +52,10 @@ def get_max_eat_count(x,y,moved,eat_count):
 
 def get_pacman_dirs(x,y,moved,eat_count,dirs):
     if moved == 3:
-        return False
+        if eat_count == max_eat_count:
+            return dirs
+        else:
+            return False
     for k in range(4):
         nx, ny = x + dpx[k], y + dpy[k]
         if not in_range(nx,ny):
@@ -62,8 +65,6 @@ def get_pacman_dirs(x,y,moved,eat_count,dirs):
         next_eat_count = eat_count
         if not is_visited[nx][ny]:
             next_eat_count += get_monster_count_at(nx,ny)
-            if next_eat_count == max_eat_count:
-                return next_dirs
         
         is_visited[nx][ny] = True
         res = get_pacman_dirs(nx,ny,moved+1,next_eat_count,next_dirs)
@@ -84,23 +85,22 @@ def move_pacman():
     #print("PD", pacman_dirs, max_eat_count)
 
     # kill monsters
-    to_remove = set()
+    to_remove = []
     for k in pacman_dirs:
         px, py = px + dpx[k], py + dpy[k]
         for i in range(len(monsters)):
             bx,by,_ = monsters[i]
             if px == bx and py == by:
-                to_remove.add(i)
-    to_remove = list(to_remove)
+                to_remove.append(i)
     to_remove.sort(reverse=True)
     for mi in to_remove:
-        bodies.append((monsters[mi][0], monsters[mi][1], 3))
+        bodies.append([monsters[mi][0], monsters[mi][1], 3])
         monsters.pop(mi)
 
 def remove_bodies():
     to_remove = []
     for i in range(len(bodies)):
-        bodies[i] = (bodies[i][0], bodies[i][1], bodies[i][2] - 1)
+        bodies[i][2] -= 1
         if bodies[i][2] == 0:
             to_remove.append(i)
     to_remove.sort(reverse=True)
@@ -118,7 +118,7 @@ for _ in range(M):
     x -= 1
     y -= 1
     d -= 1
-    monsters.append((x,y,d))
+    monsters.append([x,y,d])
 
 bodies = [] # x,y,life(0 to removed)
 for _ in range(T):
