@@ -71,9 +71,9 @@ def get_ate(x,y,moved,ate):
             is_visited[nx][ny] = True
             res = get_ate(nx,ny,next_moved,next_ate)
             is_visited[nx][ny] = False
-            if res != False:
+            if res != []:
                 return res
-    return False
+    return []
 
 def move_pacman():
     global px, py, max_eat_count, M, is_visited
