@@ -33,40 +33,41 @@ def move_monsters():
                     new_monsters[x][y] += 1
     monsters = new_monsters
 
-def set_max_ate(x,y,moved,ate):
-    global px, py, max_ate
+def set_max_ate(x,y,moved,ate,ate_count):
+    global px, py, max_ate, max_ate_count
     for k in range(4):
         nx, ny = x + dpx[k], y + dpy[k]
         if not in_range(nx,ny):
             continue
         
         next_ate = ate.copy()
+        next_ate_count = ate_count
         if not is_visited[nx][ny]:
             for k2 in range(8):
                 if monsters[nx][ny][k2] == 0:
                     continue
                 next_ate.append([nx,ny,k2,monsters[nx][ny][k2]])
+                next_ate_count += monsters[nx][ny][k2]
         
         next_moved = moved + 1
         if next_moved == 3:
-            summ = 0
-            for _,_,_,cnt in next_ate:
-                summ += cnt
-            if summ > len(max_ate):
+            if next_ate_count > max_ate_count:
+                max_ate_count = next_ate_count
                 max_ate = next_ate
                 px = nx
                 py = ny
         else:
             is_visited[nx][ny] = True
-            set_max_ate(nx,ny,next_moved,next_ate)
+            set_max_ate(nx,ny,next_moved,next_ate,next_ate_count)
             is_visited[nx][ny] = False
 
 def move_pacman():
-    global px, py, is_visited, max_ate, monsters
+    global px, py, is_visited, max_ate, max_ate_count, monsters
 
     is_visited = [[False]*4 for _ in range(4)]
     max_ate = [] # x,y,dir,cnt
-    set_max_ate(px,py,0,[])
+    max_ate_count = 0
+    set_max_ate(px,py,0,[],0)
 
     for x,y,_,_ in max_ate:
         bodies[x][y] = 3
