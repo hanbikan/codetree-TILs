@@ -24,7 +24,7 @@ def move_monster(mi):
             continue
         if nx == px and ny == py:
             continue
-        monsters[mi] = (nx,ny,cur_d)
+        monsters[mi] = [nx,ny,cur_d]
         break
 
 def get_monsters_at(x,y):
@@ -88,7 +88,7 @@ def move_pacman():
     #print(max_eat_count, ate)
 
     for mi in ate:
-        bodies.append([monsters[mi][0], monsters[mi][1], 2])
+        bodies.append([monsters[mi][0], monsters[mi][1], 3])
         monsters.pop(mi)
 
 def remove_bodies():
@@ -131,7 +131,7 @@ for _ in range(T):
     for egg in eggs:
         monsters.append(egg)
     #print("pacman=",px, py)
-    #print("monsters=", M, monsters)
-    #print("bodies=",bodies)
+    #print("monsters=", M, sorted(monsters))
+    #print("bodies=",sorted(bodies))
 
 print(len(monsters))
