@@ -87,7 +87,7 @@ def move_pacman():
     to_remove = list(to_remove)
     to_remove.sort(reverse=True)
     for mi in to_remove:
-        bodies.append((monsters[mi][0], monsters[mi][1], 2))
+        bodies.append((monsters[mi][0], monsters[mi][1], 3))
         monsters.pop(mi)
     M -= len(to_remove)
 
