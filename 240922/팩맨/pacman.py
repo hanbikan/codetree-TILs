@@ -66,7 +66,7 @@ def move_pacman():
 
     is_visited = [[False]*4 for _ in range(4)]
     max_ate = [] # x,y,dir,cnt
-    max_ate_count = 0
+    max_ate_count = -1
     set_max_ate(px,py,0,[],0)
 
     for x,y,_,_ in max_ate:
@@ -115,6 +115,7 @@ for _ in range(T):
                 monsters[i][j][k] += eggs[i][j][k]
     #        print(monsters[i][j], end=" ")
     #    print()
+    #print(px,py)
 
 summ = 0
 for i in range(4):
@@ -122,17 +123,3 @@ for i in range(4):
         for k in range(8):
             summ += monsters[i][j][k]
 print(summ)
-
-'''
-9 20
-1 1
-3 1 5
-1 3 8
-3 2 7
-3 4 1
-2 3 7
-2 4 2
-2 1 2
-3 1 6
-3 3 7
-'''
