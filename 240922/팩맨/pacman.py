@@ -88,7 +88,7 @@ def move_pacman():
     #print(max_eat_count, ate)
 
     for mi in ate:
-        bodies.append([monsters[mi][0], monsters[mi][1], 3])
+        bodies.append([monsters[mi][0], monsters[mi][1], 2])
         monsters.pop(mi)
 
 def remove_bodies():
