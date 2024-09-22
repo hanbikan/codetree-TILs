@@ -27,11 +27,11 @@ def move_monster(mi):
         monsters[mi] = (nx,ny,cur_d)
         break
 
-def get_monster_count_at(x,y):
-    res = 0
+def get_monsters_at(x,y):
+    res = []
     for i in range(len(monsters)):
         if x == monsters[i][0] and y == monsters[i][1]:
-            res += 1
+            res.append(i)
     return res
 
 def get_max_eat_count(x,y,moved,eat_count):
@@ -44,33 +44,35 @@ def get_max_eat_count(x,y,moved,eat_count):
             continue
         next_eat_count = eat_count
         if not is_visited[nx][ny]:
-            next_eat_count += get_monster_count_at(nx,ny)
+            next_eat_count += len(get_monsters_at(nx,ny))
         is_visited[nx][ny] = True
         result = max(result, get_max_eat_count(nx,ny,moved+1,next_eat_count))
         is_visited[nx][ny] = False
     return result
 
-def get_pacman_dirs(x,y,moved,eat_count,dirs):
-    if moved == 3:
-        if eat_count == max_eat_count:
-            return dirs
-        else:
-            return False
+def get_ate(x,y,moved,ate):
+    global px, py
     for k in range(4):
         nx, ny = x + dpx[k], y + dpy[k]
         if not in_range(nx,ny):
             continue
         
-        next_dirs = dirs+[k]
-        next_eat_count = eat_count
+        next_ate = ate.copy()
         if not is_visited[nx][ny]:
-            next_eat_count += get_monster_count_at(nx,ny)
+            next_ate += get_monsters_at(nx,ny)
         
-        is_visited[nx][ny] = True
-        res = get_pacman_dirs(nx,ny,moved+1,next_eat_count,next_dirs)
-        is_visited[nx][ny] = False
-        if res != False:
-            return res
+        next_moved = moved + 1
+        if next_moved == 3:
+            if len(next_ate) == max_eat_count:
+                px = nx
+                py = ny
+                return next_ate
+        else:
+            is_visited[nx][ny] = True
+            res = get_ate(nx,ny,next_moved,next_ate)
+            is_visited[nx][ny] = False
+            if res != False:
+                return res
     return False
 
 def move_pacman():
@@ -81,20 +83,11 @@ def move_pacman():
 
     # get highest priority moves
     is_visited = [[False]*4 for _ in range(4)]
-    pacman_dirs = get_pacman_dirs(px,py,0,0,[])
-    #print("PD", pacman_dirs, max_eat_count)
+    ate = get_ate(px,py,0,[])
+    ate.sort(reverse=True)
+    #print(max_eat_count, ate)
 
-    # kill monsters
-    to_remove = set()
-    for k in pacman_dirs:
-        px, py = px + dpx[k], py + dpy[k]
-        for i in range(len(monsters)):
-            bx,by,_ = monsters[i]
-            if px == bx and py == by:
-                to_remove.add(i)
-    to_remove = list(to_remove)
-    to_remove.sort(reverse=True)
-    for mi in to_remove:
+    for mi in ate:
         bodies.append([monsters[mi][0], monsters[mi][1], 3])
         monsters.pop(mi)
 
