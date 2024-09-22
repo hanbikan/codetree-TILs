@@ -30,7 +30,7 @@ def move_monsters():
                     moved = True
                     break
                 if not moved:
-                    new_monsters[x][y] += 1
+                    new_monsters[x][y][k] += 1
     monsters = new_monsters
 
 def set_max_ate(x,y,moved,ate,ate_count):
