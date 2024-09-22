@@ -85,13 +85,14 @@ def move_pacman():
     #print("PD", pacman_dirs, max_eat_count)
 
     # kill monsters
-    to_remove = []
+    to_remove = set()
     for k in pacman_dirs:
         px, py = px + dpx[k], py + dpy[k]
         for i in range(len(monsters)):
             bx,by,_ = monsters[i]
             if px == bx and py == by:
-                to_remove.append(i)
+                to_remove.add(i)
+    to_remove = list(to_remove)
     to_remove.sort(reverse=True)
     for mi in to_remove:
         bodies.append([monsters[mi][0], monsters[mi][1], 3])
