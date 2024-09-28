@@ -82,9 +82,10 @@ def calc_dist_to_catcher(x,y):
 def get_catcher_pos():
     return catcher_route[catcher_ri]
 
-def move_catcher():
-    global catcher_ri
-    catcher_ri = (catcher_ri + 1) % len(catcher_route)
+def get_catcher_d():
+    cx, cy = catcher_route[catcher_ri]
+    ncx, ncy = catcher_route[(catcher_ri + 1) % len(catcher_route)]
+    return (ncx - cx, ncy - cy)
 
 score = 0
 for t in range(1, K+1):
@@ -105,12 +106,11 @@ for t in range(1, K+1):
         runners[i][1] = nry
 
     # move catcher
-    move_catcher()
+    catcher_ri = (catcher_ri + 1) % len(catcher_route)
     cx, cy = get_catcher_pos()
 
     # catch
-    ncx, ncy = catcher_route[(catcher_ri + 1) % len(catcher_route)]
-    cdx, cdy = ncx - cx, ncy - cy
+    cdx, cdy = get_catcher_d()
     cur_cx, cur_cy = cx, cy
     for _ in range(3):
         removal_runner_indexes = set()
@@ -130,5 +130,7 @@ for t in range(1, K+1):
 
         cur_cx += cdx
         cur_cy += cdy
+        if not in_range(cur_cx, cur_cy):
+            break
 
 print(score)
