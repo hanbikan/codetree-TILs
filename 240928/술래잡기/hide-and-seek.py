@@ -87,6 +87,18 @@ def get_catcher_d():
     ncx, ncy = catcher_route[(catcher_ri + 1) % len(catcher_route)]
     return (ncx - cx, ncy - cy)
 
+def print_all():
+    cx, cy = get_catcher_pos()
+    print("TURN=", t, "SCORE=", score)
+    print("catcher=", cx, cy, "dir=", get_catcher_d())
+    print("trees=", trees)
+    print("runners=")
+    rds = [">", "v", "<", "ㅅ"]
+    for i in range(len(runners)):
+        rx,ry,rd = runners[i]
+        print("runner=", rx, ry, rds[rd])
+    print("===========================")
+
 score = 0
 for t in range(1, K+1):
     cx, cy = get_catcher_pos()
@@ -100,6 +112,7 @@ for t in range(1, K+1):
         if not in_range(nrx, nry):
             runners[i][2] = (rd + 2) % 4
             rd = runners[i][2]
+            nrx, nry = rx + rdx[rd], ry + rdy[rd]
         if nrx == cx and nry == cy:
             continue
         runners[i][0] = nrx
@@ -108,6 +121,7 @@ for t in range(1, K+1):
     # move catcher
     catcher_ri = (catcher_ri + 1) % len(catcher_route)
     cx, cy = get_catcher_pos()
+    #print_all()
 
     # catch
     cdx, cdy = get_catcher_d()
@@ -132,5 +146,6 @@ for t in range(1, K+1):
         cur_cy += cdy
         if not in_range(cur_cx, cur_cy):
             break
+    #print_all()
 
 print(score)
