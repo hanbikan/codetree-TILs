@@ -17,7 +17,7 @@ def in_range(x,y):
 def get_adjacent_line_pos(x,y):
     for k in range(4):
         nx, ny = x + dx[k], y + dy[k]
-        if in_range(nx,ny) and mapp[nx][ny] == LINE:
+        if in_range(nx,ny) and (mapp[nx][ny] == LINE or mapp[nx][ny] == TAIL):
             return (nx,ny)
 
 # starting from head
