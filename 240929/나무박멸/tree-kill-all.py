@@ -32,11 +32,11 @@ def spray_herbicide(x,y):
             nx, ny = x + ddx[k]*rep, y + ddy[k]*rep
             if not in_range(nx,ny):
                 break
+            herbicides[nx][ny] = C
             if mapp[nx][ny] <= 0:
                 break
             killed += mapp[nx][ny]
             mapp[nx][ny] = 0
-            herbicides[nx][ny] = C
 
 def print_all():
     print("TURN =", t)
@@ -100,4 +100,7 @@ for t in range(M):
                     max_pos = (i,j)
     if max_pos[0] != -1:
         spray_herbicide(max_pos[0], max_pos[1])
+    #for h in herbicides:print(h)
+    #print_all()
+
 print(killed)
