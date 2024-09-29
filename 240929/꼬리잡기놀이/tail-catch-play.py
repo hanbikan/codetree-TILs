@@ -26,6 +26,7 @@ def get_positions(x,y):
         return []
     
     res = [(x,y)]
+    to_visit = []
     for k in range(4):
         nx, ny = x + dx[k], y + dy[k]
         if not in_range(nx,ny):
@@ -33,6 +34,10 @@ def get_positions(x,y):
         if not is_human(nx,ny):
             continue
         if visited[nx][ny]:
+            continue
+        to_visit.append((nx,ny))
+    for nx, ny in to_visit:
+        if len(to_visit) >= 2 and mapp[nx][ny] == TAIL:
             continue
         visited[nx][ny] = True
         res += get_positions(nx,ny)
@@ -93,12 +98,14 @@ for r in range(K):
             mapp[x][y] = HUMAN
         mapp[new_positions[0][0]][new_positions[0][1]] = HEAD
         mapp[new_positions[-1][0]][new_positions[-1][1]] = TAIL
+        #print(positions)
 
     # add score
     hx, hy = get_first_hit_position(r)
     if hx != -1:
         visited[hx][hy] = True
         head_x, head_y = get_head_pos(hx, hy)
+        #print(head_x, head_y)
         visited[hx][hy] = False
 
         visited[head_x][head_y] = True
@@ -109,4 +116,7 @@ for r in range(K):
         # turn around
         mapp[positions[0][0]][positions[0][1]] = TAIL
         mapp[positions[-1][0]][positions[-1][1]] = HEAD
+    #for m in mapp:
+    #    print(m)
+    #print()
 print(score)
