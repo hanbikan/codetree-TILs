@@ -50,7 +50,7 @@ def get_first_hit_position(r):
             return (x,y)
         x += dx[d]
         y += dy[d]
-    return -1, -1
+    return (-1, -1)
 
 def get_head_pos(x,y):
     if mapp[x][y] == HEAD:
@@ -79,6 +79,7 @@ for r in range(K):
         for j in range(N):
             if mapp[i][j] == HEAD:
                 head_positions.append((i,j))
+    
     for i, j in head_positions:
         visited[i][j] = True
         positions = get_positions(i,j)
